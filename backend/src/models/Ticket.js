@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Ticket {
-  constructor(type) {
+  constructor(type, notes = '') {
     this.id = uuidv4();
     this.type = type; // 'billing' or 'technical'
     this.createdAt = Date.now();
@@ -10,9 +10,16 @@ class Ticket {
     this.displacementCount = 0;
     this.status = 'waiting'; // 'waiting', 'in-progress', 'resolved'
     this.lastPriorityUpdate = Date.now();
+    this.notes = notes;
+    this.tags = [];
+    this.assignedTo = null;
+    this.resolvedAt = null;
+    this.resolutionTime = null; // in milliseconds
+    this.satisfaction = null; // 1-5 rating
+    this.comments = [];
   }
 
-  // Calculate priority based on time waited and displacement
+  // Calculate priority based on time waited
   calculatePriority() {
     const timeWaitedMs = Date.now() - this.createdAt;
     const timeWaitedMinutes = Math.floor(timeWaitedMs / 60000);
@@ -39,6 +46,54 @@ class Ticket {
     return this.displacementCount < 3;
   }
 
+  // Assign ticket to support agent
+  assign(agentId) {
+    this.assignedTo = agentId;
+    return this;
+  }
+
+  // Resolve ticket
+  resolve(resolutionNotes = '') {
+    this.status = 'resolved';
+    this.resolvedAt = Date.now();
+    this.resolutionTime = this.resolvedAt - this.createdAt;
+    if (resolutionNotes) {
+      this.comments.push({
+        author: 'system',
+        message: resolutionNotes,
+        timestamp: Date.now()
+      });
+    }
+    return this;
+  }
+
+  // Add comment
+  addComment(author, message) {
+    this.comments.push({
+      author,
+      message,
+      timestamp: Date.now()
+    });
+    return this;
+  }
+
+  // Add tags
+  addTag(tag) {
+    if (!this.tags.includes(tag)) {
+      this.tags.push(tag);
+    }
+    return this;
+  }
+
+  // Set satisfaction rating
+  setSatisfaction(rating) {
+    if (rating >= 1 && rating <= 5) {
+      this.satisfaction = rating;
+      return true;
+    }
+    return false;
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -48,7 +103,14 @@ class Ticket {
       currentPriority: this.currentPriority,
       displacementCount: this.displacementCount,
       status: this.status,
-      lastPriorityUpdate: this.lastPriorityUpdate
+      lastPriorityUpdate: this.lastPriorityUpdate,
+      notes: this.notes,
+      tags: this.tags,
+      assignedTo: this.assignedTo,
+      resolvedAt: this.resolvedAt,
+      resolutionTime: this.resolutionTime,
+      satisfaction: this.satisfaction,
+      comments: this.comments
     };
   }
 }

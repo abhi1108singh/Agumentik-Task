@@ -26,6 +26,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .header-content h1 {
@@ -37,6 +39,24 @@ body {
 .header-content p {
   font-size: 14px;
   opacity: 0.9;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .header-status {
@@ -123,6 +143,11 @@ body {
   .app-header {
     flex-direction: column;
     gap: 15px;
+    align-items: flex-start;
+  }
+
+  .header-nav {
+    width: 100%;
   }
 
   .stats-grid {
